@@ -19,20 +19,22 @@ while True:
     client_socket, client_address = server_socket.accept()
     print(f"Connection from {client_address}")
 
+    # read the request AND get the file name
     request_data = client_socket.recv(4096).decode()
     parts = request_data.split()
     filename = parts[1].lstrip('/')
     print(f"Received filename: {filename}")
-
+    root, extension = os.path.splitext(filename)
+    #check if file exists
     if not os.path.exists(filename):
         response = f"HTTP/1.0 404 NOT FOUND\r\n\r\n"
         client_socket.sendall(response.encode())
-    #  if exist, must send status and file in single request
-    else:
-        file = open(filename, 'r')
+  
+    else:  
+        file = open(filename, 'rb') #reading bytes because of image files
         file_data = file.read()
-        response = (f"HTTP/1.1 200 OK\r\nContent-Length: {len(file_data)}\r\n\r\n" + file_data).encode()
-
+        content_type = "text" if extension == '.txt' else "image"
+        response = (f"HTTP/1.1 200 OK\r\nContent-Type: {content_type}\r\n\r\n").encode() + file_data
         client_socket.sendall(response)
         
     client_socket.close()
