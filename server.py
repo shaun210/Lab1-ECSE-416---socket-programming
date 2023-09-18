@@ -26,6 +26,7 @@ while True:
     print(f"Received filename: {filename}")
     root, extension = os.path.splitext(filename)
     #check if file exists
+    
     if not os.path.exists(filename):
         response = f"HTTP/1.0 404 NOT FOUND\r\n\r\n"
         client_socket.sendall(response.encode())

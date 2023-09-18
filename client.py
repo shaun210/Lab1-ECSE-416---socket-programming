@@ -46,33 +46,39 @@ try:
      # Split the status line by spaces to extract the status code
     status_code = status_line.split(b' ')[1].decode('utf-8')
 
-    content_type = headers.split(b'\r\n')[1]
-    content_type = content_type.split(b': ')[1].decode('utf-8')
-
-    headers = response[:header_end_index].decode()
-
-    # Process the response based on Content-Type
-    if content_type == "text":
-        response_body = response[header_end_index + 4:].decode('utf-8')
-    else:
-        response_body = response[header_end_index + 4:]
-
-    if status_code == '200':
-        print("Request successful - 200 OK")
-        print(f"Content Type: {content_type}")
-        if (content_type == 'text'):
-            filename_received = f"received_txt.txt"
-            file_path = os.path.join(save_folder, filename_received)
-            with open(file_path, 'w') as file:
-                file.write(response_body)
-        else:
-            filename_received = f"received_image.png"
-            file_path = os.path.join(save_folder, filename_received)
-            with open(file_path, 'wb') as file:
-                file.write(response_body)
-        
-    elif status_code == '404':
+    if status_code == '404':
         print("Server HTTP Response: HTTP 404 not found")
+        
+    else :
+
+        content_type = headers.split(b'\r\n')[1]
+        content_type = content_type.split(b': ')[1].decode('utf-8')
+
+        headers = response[:header_end_index].decode()
+
+        # Process the response based on Content-Type
+        if content_type == "text":
+            response_body = response[header_end_index + 4:].decode('utf-8')
+        else:
+            response_body = response[header_end_index + 4:] # for image, use data in the form of bits.
+
+        if status_code == '200':
+            print("Request successful - 200 OK")
+            print(f"Content Type: {content_type}")
+            if (content_type == 'text'):
+                filename_received = f"received_txt.txt"
+                file_path = os.path.join(save_folder, filename_received)
+                with open(file_path, 'w') as file:
+                    file.write(response_body)
+            else:
+                filename_received = filename
+                file_path = os.path.join(save_folder, filename_received)
+                with open(file_path, 'wb') as file:
+                    file.write(response_body)
+            print("Success !!!")
+        
+    # elif status_code == '404':
+    #     print("Server HTTP Response: HTTP 404 not found")
 
 except socket.timeout:
     print("Timeout bruh")
